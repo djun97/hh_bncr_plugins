@@ -2,7 +2,7 @@
  * @author 小寒寒
  * @name 店铺签到
  * @origin 小寒寒
- * @version 1.2.0
+ * @version 1.2.1
  * @description 店铺签到，爬取、签到、清理与一体的店铺左侧签到插件
  * @rule ^(店铺签到|签到检查|签到爬取|签到清理)$
  * @rule ^(签到转码)([\s\S]+)$
@@ -62,7 +62,7 @@ v1.2.0 定时执行的管理员通知支持自定义平台了，并增加签到�
 const qlNum = 0; // 取哪个容器的ck
 const ckNum = 999; // 签到有效ck数
 const limit = 20; // 店铺签到限制数
-const signTxtUrl = 'http://jd.lsy22.cn/BFx'; // 签到爬取的文档
+const signTxtUrl = 'https://shimo.im/docs/9jYgTY3vJvPYtqWD'; // 签到爬取的文档
 const prizeNum = 50; // 奖品数量，低于则不入库
 const maxRetryCount = 5; // 签到重试次数
 const pinBlack = []; // 屏蔽的CK
