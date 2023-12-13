@@ -2,7 +2,7 @@
  * @author 小寒寒
  * @name 青龙通知接口
  * @origin 小寒寒
- * @version 1.1.0
+ * @version 1.1.1
  * @description 青龙通知接口，根据通知标记活动，适配于麦基EVE库，搭配库里SpyIsValid使用，需配置对接token，set SpyIsValid ql_token xxxx，自行需要修改推送群号 不能其它通知接口插件共用
  * @public false
  * @priority 99
@@ -17,6 +17,7 @@
  * 1.0.8 垃圾或领完只根据ck1的判断来标记，减少标记错误的可能性，新增仅需执行一次的活动标记
  * 1.0.9 增加M粉丝互动定时
  * 1.1.0 代码及标记判断优化，修复部分bug
+ * 1.1.1 增加使用go-cqhttp通知接口的方式来对接，具体查看apiMode变量，用于解决麦基脚本无法通知的问题
  */
 
 // 指定标题推送
@@ -37,6 +38,7 @@ const title1 = ['东东农场',
     '京东调研问卷',
     '京东白嫖提醒',
     '京东资产统计cookie已失效',
+    '新农场任务',
     // '京东CK检测',
     // 'WSKEY转换',
 ]
@@ -61,6 +63,11 @@ const onlyTitles = ['M分享有礼', 'M试用有礼', 'M邀请有礼WX', 'M邀�
 // SpyIsValid相关功能，默认开启
 const spyIsValidEnable = true;
 
+// 1用bncr接口 export BncrHost="http://192.168.2.5:9090" export BncrToken="token"
+// 2用go-cqhttp接口 export GOBOT_URL="http://192.168.2.5:9090/api/qinglongMessage" export GOBOT_TOKEN="token"
+// 2选1，用其中一个需把另外一个变量设置为空
+const apiMode = 2; 
+
 const SpyIsValid = new BncrDB('SpyIsValid');
 const dayjs = require('dayjs');
 /* post接口 */
@@ -69,7 +76,13 @@ router.post('/api/qinglongMessage', async (req, res) => {
         const setToken = await SpyIsValid.get('ql_token', null);
         if (!setToken) return res.send({ code: 401, data: '', msg: '未设置token，拒绝访问' });
         let { title, message, token } = req?.body;
-        if (token !== setToken) return res.send({ code: 400, data: '', msg: '青龙BncrToken与Bncr setToken不一致' });
+        if (apiMode == 1) {
+            if (token !== setToken) return res.send({ code: 400, data: '', msg: '青龙BncrToken与Bncr setToken不一致' });
+        }
+        else {
+            title = message.split('\n')[0];
+            message = message.replace(title + '\n', '');
+        }
         // /* 标题 */
         // console.log('title', title);
         // /* 推送日志 */
@@ -85,8 +98,8 @@ router.post('/api/qinglongMessage', async (req, res) => {
         }
         //订阅变更和豆豆推个人微信
         if (/(新增任务|删除任务)/.test(title)
-            || (/\d+】\S*\d+京豆/.test(message) && !['M签到有礼', 'M京东签到'].includes(title))
-            || (/天,\d+京豆/.test(message) && title == 'M签到有礼')
+            || (/\d+】\S*\d+(京豆|元E卡)/.test(message) && !['M签到有礼', 'M京东签到'].includes(title))
+            || (/天,\d+(京豆|元E卡)/.test(message) && title == 'M签到有礼')
             || (/,已填地址/.test(message) && !['M积分兑换', 'M试用有礼'].includes(title))
         ) {
             if (push2.notify) {
@@ -128,7 +141,7 @@ router.post('/api/qinglongMessage', async (req, res) => {
                         await SpyIsValid.set(activityId, '活动已结束');
                         message += `\n\nBncr已标记：活动已结束`;
                     }
-                    else if (/(垃圾或领完|垃圾活动|才能参与抽奖|已达到活动期间最大抽奖次数|没有豆子)/.test(message) && !/设置了前\d+不能抽奖跳出/.test(message)) { // 垃圾活动标记，但抽奖跳出的也会判断垃圾或领完，故剔除
+                    else if (/(垃圾或领完|垃圾活动|才能参与抽奖|已达到活动期间最大抽奖次数|没有豆子|奖品已经?发完|礼包已经不存在)/.test(message) && !/设置了前\d+不能抽奖跳出/.test(message)) { // 垃圾活动标记，但抽奖跳出的也会判断垃圾或领完，故剔除
                         await SpyIsValid.set(activityId, '垃圾或领完');
                         message += `\n\nBncr已标记：垃圾或领完`;
                     }
@@ -194,7 +207,7 @@ router.post('/api/qinglongMessage', async (req, res) => {
                     }
                     else if (onlyTitles.includes(title) || /(该活动仅可成功参与一次|已经组满)/.test(message)) { // 仅需执行一次的活动标记
                         await SpyIsValid.set(activityId, `${title}仅执行一次`);
-                        message += `\n\nBncr已标记：仅可执行一次，如需再次运行请使用Spy立即运行命令或删除标记。`;
+                        message += `\n\nBncr已标记：仅可执行一次。`;
                     }
                 }
             }
@@ -210,7 +223,7 @@ router.post('/api/qinglongMessage', async (req, res) => {
         }
 
         /* 返回结果 */
-        return res.send({ code: 200, data: '', msg: 'ok' });
+        return res.send({ code: 200, data: '', msg: 'ok' , retcode: 0 });
     } catch (e) {
         console.log(e);
         res.send({ code: 400, data: '', msg: '参数有误！' });
