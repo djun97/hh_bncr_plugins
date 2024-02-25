@@ -13,8 +13,8 @@
 - 薛定谔的大灰机
   https://github.com/BigPlanes/Bncr_plugins
 
-- 小熊
-  https://github.com/hsl6476/Bncr_plugins
+~~- 小熊
+  https://github.com/hsl6476/Bncr_plugins~~
 
 - Dswang
   https://github.com/callacat/BncrJS_plugins
