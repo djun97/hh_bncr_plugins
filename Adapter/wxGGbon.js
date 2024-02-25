@@ -30,14 +30,14 @@ module.exports = async () => {
   let GGbonUrl = ConfigDB.userConfig.sendUrl;
   if (!GGbonUrl) return console.log('千寻:配置文件未设置sendUrl');
   //这里new的名字将来会作为 sender.getFrom() 的返回值
-  const wxGGbon = new Adapter('wxGGbon');
+  const wxGGbon = new Adapter('wxQianxun');
   // 包装原生require   你也可以使用其他任何请求工具 例如axios
   const request = require('util').promisify(require('request'));
   const qs = require('querystring');
   const iconv = require('iconv-lite');
   // wx数据库
-  const wxDB = new BncrDB('wxGGbon');
-  let botId = await wxDB.get('ggbon_botid', ''); //自动设置，无需更改
+  const wxDB = new BncrDB('wxQianxun');
+  let botId = await wxDB.get('qianxun_botid', ''); //自动设置，无需更改
   /**向/api/系统路由中添加路由 */
   router.get('/api/bot/GGbon', (req, res) =>
       res.send({ msg: '这是Bncr GGbon Api接口，你的get请求测试正常~，请用post交互数据' })
@@ -49,7 +49,7 @@ module.exports = async () => {
           body = JSON.parse(body);
           if (botId !== body.wxid)
               /* 另一种set数据库操作，第三个值必须为一个对象，传入def字段时，设置成功返回def设置的值*/
-              botId = await wxDB.set('ggbon_botid', body.wxid, { def: body.wxid });
+              botId = await wxDB.set('qianxun_botid', body.wxid, { def: body.wxid });
 
           // console.log('消息类型:', body.data.data.msgType);
 
