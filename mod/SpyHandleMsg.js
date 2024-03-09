@@ -11,18 +11,20 @@
 
 const jsonSchema = BncrCreateSchema.object({
     list: BncrCreateSchema.array(BncrCreateSchema.object({
-        keyword: BncrCreateSchema.string().setTitle('keyword').setDescription(`填写正则表达式`).setDefault(""),
+        keyword: BncrCreateSchema.string().setTitle('keyword').setDescription(`填写正则表达式，开头结尾无需“/”`).setDefault(""),
         name: BncrCreateSchema.string().setTitle('name').setDescription(`任务名称`).setDefault(""),
+        enable: BncrCreateSchema.boolean().setTitle('enable').setDescription(`是否启用`).setDefault(true),
         trans: BncrCreateSchema.array(BncrCreateSchema.object({
             ori: BncrCreateSchema.string().setTitle('ori').setDescription(`当多变量的时候按顺序填写需要在链接中提取的参数`).setDefault(""),
-            redi: BncrCreateSchema.string().setTitle('redi').setDescription(`青龙变量`).setDefault(""),
-            sep: BncrCreateSchema.string().setTitle('sep').setDescription(`连接符`).setDefault(""),
-        })).setTitle('trans').setDescription(`解析规则`).setDefault([])
-    })).setTitle('解析配置').setDescription(`解析配置`).setDefault([
+            redi: BncrCreateSchema.string().setTitle('redi').setDescription(`需要解析成脚本变量名`).setDefault(""),
+            sep: BncrCreateSchema.string().setTitle('sep').setDescription(`多变量的时候连接符`).setDefault(""),
+        })).setTitle('trans').setDescription(`解析规则，点击右下角+号增加，支持多个`).setDefault([]),
+    })).setTitle('解析配置').setDescription(`解析配置，点击右下角+增加解析`).setDefault([
         {
             keyword: "",
             name: "",
-            trans: []
+            trans: [],
+            enable: true
         }
     ])
 });
@@ -76,7 +78,7 @@ module.exports = async msg => {
  *
  */
 function ListS() {
-    return ConfigDB.userConfig.list;
+    return ConfigDB.userConfig.list.filter(o => o.enable);
 }
 
 /* 诺兰口令解析接口 */
