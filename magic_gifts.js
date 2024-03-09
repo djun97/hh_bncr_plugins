@@ -2,7 +2,7 @@
  * @author 小寒寒
  * @name magic_gifts
  * @origin 小寒寒
- * @version 1.0.6
+ * @version 1.1.0
  * @description 查询gifts.csv 命令：查实物 10
  * @rule ^查询实物 ([\d]+)$
  * @rule ^查实物 ([\d]+)$
@@ -12,11 +12,94 @@
  */
 
 //HumanTG、pgm适配器请升级至最新版
-const qlNums = [0]; // 取哪个容器，多容器[0,1,2]
-const qlScript = 'walle1798_EVE'; // 取哪个库的gitfs.csv，二选一
-//const qlScript = 'walle1798_WALL.E'; // 取哪个库的gitfs.csv，二选一
-const delMsgTime = 20; // 自定义实物消息撤回时间，秒数
 
-const QlMod = require('../红灯区/mod/AmQlMod.js');
 
-/** Code Encryption Block[be188605b2af9d5e9f0e7db22a9634fce58a85ada4591bb20294321de7c5a0f4cdc34d4c8000635b5760b17809de49e1cea00674af4eeac9c336372c0d6980fd382eb759b72925a800d846c2b358a14c681a9fa27217ad258bf9dcf680b23b6a5e61d8618798265c0ce904fad13509983be88ee92e2342555277a2b1398433a1d308767e2b857e2dd67df6c1ae1dad25bdb73e03bc532a513618dde389a0e77e4bc4662b8d757ff6a67f9b605105b9c601125d1a57b7a014f92caccdbf6b7c69c337b18be8d92e6c9f9745031abc284cf6303bf0bb2c6ec8bbb44dde8e3fc52dc4b9a16dff3bafa26104baf3a3275c32eaba4dd8f379de9bf717e4ba11cd4b5afce19ab7110342041db30c7264c44c059fcd65ab95ea6eca45e6fa6f4b57c14b4203a57e893f794e9c0197d92f25b45db04216c15d78c9bd051611ee885b8901dab825f51e95166a8b51c01da314f0d57f3165ce4799df956e51a2de059b9bdc7138a8fb0cfb341d0b77c630c1be4b77be9ef6ae96f3ec847361f0b1ce920a6c07cee071a8d2caa4c9d93357a97fae82e45cf1e286dc4b7a58057202610d8f56210b13f2a89bbabbdbb9b2fb302610466d7946c9ff2f7e3554e5eeb69e5df8b1cc8be77c9e61f5e4470af23ef831428791bccdf6f9ebe3b56156292a21e0de9da54f8230005a23ff31e97d38aae901602a49966ce7bb159648b9814dca2afd3b557d32a8ff2f681b15c5e8afb2e015a28332df49a44c38a19a26bd4a09dbbdf23b612d6df5aaecfa20fb97b114b532fcaaa540d4a6821ccd10501ab03fddcd67daf62d0eb04edfd004cc5299a2043a1b98717b146359fa9a0a6364fd3e7d594a8b7ecbd86c03b9fc66336172210c856e6e23557a00d7945e70bacc7bff3a24397b3c9bbff5e9c02b71202445baa0c83e262bf45dafe3c0684a27c8f1fb1f60301b76345db9eddd8609dd875e82e2ca290c39bf9702982be60b6484559c706198be11ef2595c9bfc7d3a6650f2f63b02c2d009032b06c38b39dda371b737a895bcccb88455e3ec528ae4d1cf015f79b2c4adca348b2adaa9dd9021b1e69686265fefd1fde92741aa9e674888e6e2a1af875fa26a5f23612de2a2015d54cad9d1affb0269a03b4d9fe2e51abccc4fce5831ea36bca3d9cd0a3db2c2f24ca0c8f59ed3a7c622f54660e141b7e77300b1a1fd2b74e60cc8875c087996e1a5853892c4466f2899eff4c1fafe2a37d20277c80c6fef1f4f8d198e247c54a4da252f00ff01dc102115075764c2750058700315ce92caa083c0bbedc70fc965d9cdc445a5fddfe440771024128cde72321770a49b61b27f9090b3d3f6903730ecccb302982d31a0788d19a578cc97565fdb726f4d9b22367a5e0594267442571b8b74d38cea44cfcf0009030be148321c0905641288b13ea446b2acb0b8224d495be8232d318b9437dad40b575214a6e6ff271643aaf84a38a97b7ba792249bfe0f7639d476eb5d3537ed8d272b996a60b34bc150381926dda667b3e8b8f6673fecf7c06c7fa1cd76c5d0ca0a7bed1acf9c3caf073624d4c15153bb8f1942f597cab21e6dfddec64ef788a7749bc1ca4fb7df7dc51ded6cb91b650f6626529b70084f2540511707f9e064326ae290a3cc40f4e26d5cdb1975a93c8c45c93c25bfd556e75acb1882a79116c8f330e285e837da835f6b3f99f9ce81599f44ff33b2d9c6e7cc3512025a55ca83d7eb2f0ab671e0decab3b5865ee1b23a19286a0b9aec9056f0c08daa50d47c52df5307ece4949791081d2480532bda73ad8624f4b19007fc35c8b4d33d8a4b300e47b3623b290ca51c85685a56a3468df24649586758d10d0484d9968143ca6842fbd92e0a075e3e85007bb536825ee1a7581321fa36fb2f51357d15f594a2d7a4c9b3f9b48af822fcb6a49f4f5a9898331270d86d59390430d394e1fbb1b123b076b2f3e6a5662a60bb77e250a409bf673a1df279629d15d30810117cf74b7a4b6ec632d632b0d78c8d2788b9525a81afe26daae7e842ebcdabdf2ecc84061a13e1f2dba37376152dfacc1a254e57340cb6371a77ba3b628140a91b7bb9e492cbb0e5461e2261eef2f9e3450e19d6acb5917843635a429efc7b278d87a2a6acb2fb1087fa972c518ccc04dcb830042bf42701455e27d833cf2ee2820202c2221a11fcc05d4cdd7269ce67dfd2864112c6a5e5dee14098cb4e3b7840b18a86aae8ab21efdea3577c12676bdce9dfe3b1c348e91cb3c9b649215867f2965cf70dd5c61662f1c1ee2e70cd2455d392d9e27464db55b982c3fae95e8167fb9031810857120b6c5fa25b829ee589b7540e587ceccf96fe5b872fbe01d4e3a322823a20e490ff9510513cb64dc755600b4e2bf0ff6acdbc2a1146a569513840aa3ec4c46370e6763a4f5c7c6d53a742a55379b48cb09d480ada6d1564f28ccdc10b28284e2e8cbfe9b54c029aa2ca8e3d386719cb39f4a51647154bcde1f719120526d206813dc169f44b7db7a1439fe8eea2a391cf623d00536c469cd153d172a9f3ba8932babb0f9af7fd2b4b58c16bf13c1b21a031cb2040e6b840d9932bf962b254298dc107a8793a92d95b4235204347269f12d8356ef604d54bbde001b2d03829e0733837dbfa3ceb78caba36d73996696791b0eea00e2fc5fddf2285d826f11956327ba3e0ce23e2426c176d6e6edeb7405644bb1b64d18c775e4f952290ccd84bc57fa50ad657de6a887ff6a16298163073b5cdf65d4af758e2faaabf5e0c1fb7f2712d6b97555699680a2fe2e09c22cc6f9e494a28fc6719c8f74fb49e55363b05f9a95c4dcf2c1f833a39fcd44b3023e89e0f90152e0b8373b9ef4ef6f9f1fb16c339da7fcd858dea4d1fe97eb43077ee0e8369af81a1b06df795a377846a88b1285aa1e7bc6895763dd64086d16978f4e6aa8306bb921b2a6dd4c685cc338191d2b0e8fdc08d4768ad91d303d1c1379b8e15297764aa7836fd72ed6bfe4630f907a7a3456a54ab3c3d508cc025283b0a953bbf577cd3bc47c7011b83b57a55228a83192bd7c369c655e10c8e6ecbaffa2ae7636d56e6a32a8352aab31fe9607b6fe968f4f264f369cab31abe0b0fe46cb51b74cad8a030cd2a55a77d7a53c8d8db7a8295abf249d0286c09175369cb0ed3d120c00a693ca9ff9b416daa74ae95f622c032b870898ecfdd05c5c707b7d21dba5b3ebfb92b737b4517a21a7e196e35eb00fb87e25ae264e68135d130277c49704a3981c134eae5ef05236c6060dd93c29d45ecb56f6b636b90e75ae85651410e95fd93d6b105b485dca67900e484e5665e2fcdd8d47d8ecd9e9d4428d15639ae697e3ac826d1e59400f6964bdddee6109b349f207ab474dd64550590eaca71657be53835a71b276fa391f9f7648896c9db3b5e52f9d50166447d6ffd3bcae040af6656036749a9a59ea03288a07e1a8b78225e5d1195d3b635aef942981e1d6dc37471affb7ccb0f266d1b8caf849bdb8d91a7936aace6835232bfb3f099216c4fa0b6d87f37792eda41dd1a4d17542fa8e505627f3298a73cb03db69d0baabefb8f991736541b193fe27d7e3c2f9d1194af204d9e053561474cb2f54ce7fd2a0594b74fb77c1b7b985462c34189f28042ab3e355324c290003457465541735e42cb7ae5442280420a42fbbda9857ff5531cfb8bee7d524db270a1bcad0c9a9a4172ec96a04eb597911f2eed37a12907567d8f80b9fd7a1018272d1cc5fc4de4e654801f2bb6fd44f37d42fc3ad007ceca674f8ccbb1ba0a38d2051ac905c73999544356c1f6d0ab0c6ded4a9f488ebdb0b38d40dfc0b222e15b973fb917b2f9585924456572a29b6e6c99078e38f88b57f7e4c7aad284991172309f4be116b105113794b1270dc3a55c4b1ff3c0a24eadf3200ba5f7f2a19ab5ccebd30b6a1844917d2025a9f509e2cf886daca8c9fa6dff4d07b35d34fa5e49a12b29e00865dbed1eb9c57e6e20859c03fb2dc15438676e20d964c86c8a16a0bc481dbdc25786c5c14ad8c202e31db63c700b6151126e8964410d8d5decb702a66f98d51729dde89cc] */
+/* HideStart */
+const jsonSchema = BncrCreateSchema.object({
+    qlNums: BncrCreateSchema.array(BncrCreateSchema.number()).setTitle('容器序号').setDescription(`取哪个容器，支持多个，从0开始`).setDefault([0]),
+    qlScript: BncrCreateSchema.string().setTitle('对应库名').setDescription('取哪个库的gitfs').setDefault("walle1798_EVE"),
+    delMsgTime: BncrCreateSchema.number().setTitle('消息撤回时间').setDescription(`自定义实物消息撤回时间，秒数`).setDefault(20),
+});
+
+const ConfigDB = new BncrPluginConfig(jsonSchema);
+
+//插件入口
+module.exports = async s => {
+    await ConfigDB.get();
+    // console.log('ConfigDB.userConfig', ConfigDB.userConfig);
+    if (!Object.keys(ConfigDB.userConfig).length) {
+        return await s.reply('请先发送"修改无界配置",或者前往前端web"插件配置"来完成插件首次配置');
+    }
+    const qlNums = ConfigDB.userConfig.qlNums; // 取哪个容器
+    const qlScript = ConfigDB.userConfig.qlScript; // 取哪个库的 gitfs.csv，二选一
+    //const qlScript = 'walle1798_WALL.E'; // 取哪个库的gitfs.csv，二选一
+    const delMsgTime = ConfigDB.userConfig.delMsgTime; // 自定义实物消息撤回时间，秒数
+
+    const QlMod = require('../红灯区/mod/AmQlMod.js');
+    const request = require('util').promisify(require('request'));
+    let qlDb = await QlMod.GetQlDataBase();
+    let qlDbArr = qlDb['data'] || [];
+    if (qlDbArr.length == 0) return s.reply('请先发“面板管理”添加面板');
+    const AmingScriptQl = new BncrDB('AmingScriptQl');
+    for (let qlNum of qlNums) {
+        console.log('青龙版本：' + JSON.stringify(await QlMod.GetQlVersion(qlDbArr, qlNum)));
+        const ql_token = (await AmingScriptQl.get(`${qlDbArr[qlNum].ClientID}_token`)).token;
+
+        let giftsData = await request({
+            url: `${qlDbArr[qlNum].Host}/open/scripts/gifts.csv?path=${qlScript}`,
+            headers: {
+                'Authorization': `Bearer ${ql_token}`
+            },
+            method: 'get',
+            json: true
+        });
+        if (giftsData.body?.data) {
+            let gifts = giftsData.body.data;
+            let lines = gifts.split(/\r?\n/);
+            console.log(`共计${lines.length}个实物`);
+            lines = lines.reverse();
+            let msg = [];
+            const num = Number(s.param(1));
+            if (num == 0) {
+                return s.delMsg(await s.reply('命令错误，请重新输入！'), { wait: 10 });
+            }
+            for (let t of lines || []) {
+                if (msg.length == num) {
+                    break;
+                }
+                let item = t.split(',');
+                if (item[0] && !item.includes('M试用有礼')) {
+                    let message = `${msg.length + 1}. ${item[1]}，${item[2].slice(0, 2)}***${item[2].slice(-1)}，${item[5]}，${item[0].slice(0, 19)}`;
+                    if (['pgm', 'HumanTG'].includes(s.getFrom())) {
+                        message += `，[活动地址](https://www.yanyuwangluo.cn/jd/?url=${item[7]})`;
+                    }
+                    else {
+                        message += `，活动地址：${item[7]}`;
+                    }
+                    msg.push(message);
+                }
+            }
+            if (msg.length == 0) {
+                s.delMsg(await s.reply('你都没有中实物，你是非洲人吗~'), { wait: 10 });
+            }
+            else {
+                s.delMsg(s.getMsgId());
+                if (['pgm', 'HumanTG'].includes(s.getFrom())) {
+                    s.delMsg(await s.reply({
+                        msg: `${msg.join('\n')}`,
+                        type: 'markdown'
+                    }), { wait: 10 });
+                }
+                else {
+                    s.delMsg(await s.reply(msg.join('\n')), { wait: delMsgTime });
+                }
+            }
+        }
+        else {
+            s.delMsg(await s.reply('gifts.csv文件不存在'), { wait: 10 });;
+        }
+
+        await sysMethod.sleep(3);
+    }
+};
+/* HideEnd */
