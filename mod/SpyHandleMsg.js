@@ -44,12 +44,12 @@ module.exports = async msg => {
      当触发的消息中没有 export格式变量时,触发的消息会经过此模块解析
      因此,你可以在此模块中添加你对export以外的消息进行解析,返回一个export线报
     */
-    const urlReg = /https:\/\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\*\+,%;\=]*/g;
+    const urlReg = /https:\/\/[A-Za-z0-9\-\._~:\/\?#\[\]!$&'\*\+,%;\=]*/g;
     const codeReg = /[(|)|#|@|$|%|¥|￥|!|！][0-9a-zA-Z]{10,14}[(|)|#|@|$|%|¥|￥|!|！]/g;
     const urlArr = msg.match(urlReg)?.map(url => decodeURIComponent(url)) ?? [];
     const codeArr = msg.match(codeReg) ?? [];
     for (const [i, code] of codeArr.entries()) {
-        const res = await nolanDecode(code);
+        const res = await naiziDecode(code);
         res ? (codeArr[i] = res) : codeArr.slice(i, 1);
     }
     let result = '';
@@ -81,22 +81,18 @@ function ListS() {
     return ConfigDB.userConfig.list.filter(o => o.enable);
 }
 
-/* 诺兰口令解析接口 */
-async function nolanDecode(code) {
+/* 口令解析接口 */
+async function naiziDecode(code) {
     try {
-        const dbUrl = await new BncrDB('AmingScript').get('deCodeHost', 'https://api.nolanstore.cc');
         return (
             await request({
-                url: `${dbUrl}/JComExchange`,
-                method: 'post',
-                body: {
-                    code,
-                },
+                url: `http://sign.lolkda.top/api/jComExchange?kl=${encodeURIComponent(code)}`,
+                method: 'get',
                 json: true,
             })
         )?.body?.data?.jumpUrl;
     } catch (e) {
-        console.log('nolanDecode ' + e);
+        console.log('naiziDecode ' + e);
         return void 0;
     }
 }
