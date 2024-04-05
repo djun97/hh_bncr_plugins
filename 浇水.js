@@ -1,8 +1,8 @@
 /**
  * @author 小寒寒
  * @name 浇水
- * @origin 东东农场浇水，基于muzi修改
- * @version 1.0.0
+ * @origin 东东农场浇水，基于muzi二改
+ * @version 1.0.1
  * @description 浇水
  * @rule ^浇水$
  * @rule ^js$
@@ -166,7 +166,7 @@ module.exports = async (s) => {
             console.log(response);
             if (response?.code === "0") {
                 const totalEnergy = response.totalEnergy;
-                s.reply(`【${chosenAccount.pin}】浇水10g，目前剩余${totalEnergy}g`);
+                count == 0 && s.reply(`【${chosenAccount.pin}】浇水10g，目前剩余${totalEnergy}g，持续浇水中...`);
                 if (totalEnergy < 10) {
                     s.reply(`水滴不够了~`);
                     clearInterval(main);
