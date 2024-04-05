@@ -31,7 +31,8 @@ const jsonSchema = BncrCreateSchema.object({
 
 const ConfigDB = new BncrPluginConfig(jsonSchema);
 
-const request = require('util').promisify(require('request'));
+const Doraemon_tool = require('../../Doraemon/mod/Doraemon_tool');
+const wx100shareParse = require('../../hh_bncr_plugins/mod/wx100shareParse');
 
 module.exports = async msg => {
 
@@ -49,12 +50,16 @@ module.exports = async msg => {
     const urlArr = msg.match(urlReg)?.map(url => decodeURIComponent(url)) ?? [];
     const codeArr = msg.match(codeReg) ?? [];
     for (const [i, code] of codeArr.entries()) {
-        const res = await naiziDecode(code);
+        const res = await jCommand(code);
         res ? (codeArr[i] = res) : codeArr.slice(i, 1);
     }
     let result = '';
-    for (const link of [...urlArr, ...codeArr])
+    for (let link of [...urlArr, ...codeArr]) {
+        if (/interaction\/v2\/landing\/share\/\?shareId=\d+/.test(link)) {
+            link = await wx100shareParse(link);
+        }
         urlToExport(link)?.forEach(e => (result += `export ${e.name}="${e.value}"\n`));
+    }
     /*
     如果该导出的函数返回值不是一个string或不是一个 export格式的线报时,该msg会被放弃
     如果该模块中的代码报错 将强制返回空字符串
@@ -82,17 +87,13 @@ function ListS() {
 }
 
 /* 口令解析接口 */
-async function naiziDecode(code) {
+async function jCommand(code) {
     try {
         return (
-            await request({
-                url: `http://sign.lolkda.top/api/jComExchange?kl=${encodeURIComponent(code)}`,
-                method: 'get',
-                json: true,
-            })
-        )?.body?.data?.jumpUrl;
+            await Doraemon_tool.commandParse(code)
+        )?.jumpUrl;
     } catch (e) {
-        console.log('naiziDecode ' + e);
+        console.log('jCommand ' + e);
         return void 0;
     }
 }
