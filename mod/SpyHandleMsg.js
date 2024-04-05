@@ -55,8 +55,9 @@ module.exports = async msg => {
     }
     let result = '';
     for (let link of [...urlArr, ...codeArr]) {
-        if (/interaction\/v2\/landing\/share\/\?shareId=\d+/.test(link)) {
-            link = await wx100shareParse(link);
+        if (/\?(shareId|shareKey)=[0-9a-zA-Z]+/.test(link)) {
+            let newLink = await wx100shareParse(link);
+            if (newLink) link = newLink;
         }
         urlToExport(link)?.forEach(e => (result += `export ${e.name}="${e.value}"\n`));
     }
