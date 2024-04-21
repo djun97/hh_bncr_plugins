@@ -39,3 +39,6 @@
 
 - sumuen
   https://github.com/sumuen/Bncr_plugin
+
+- Merrick
+  https://github.com/Merrickk/Bncr_plugins/tree/main
