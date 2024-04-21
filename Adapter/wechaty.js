@@ -3,7 +3,7 @@
  * @author 小寒寒
  * @name wechaty
  * @origin Bncr团队
- * @version 1.0.0
+ * @version 1.0.1
  * @description wx机器人适配器
  * @adapter true
  * @public false
@@ -18,7 +18,8 @@ const jsonSchema = BncrCreateSchema.object({
     enable: BncrCreateSchema.boolean().setTitle('是否开启适配器').setDescription(`设置为关则不加载该适配器`).setDefault(false),
     name: BncrCreateSchema.string().setTitle('机器人标识').setDescription(`设置后后续自动登录，更换微信时请更换标识`).setDefault('wechaty'),
     accept: BncrCreateSchema.boolean().setTitle('自动同意好友申请').setDescription(`设置后自动同意微信好友申请`).setDefault(true),
-    hello: BncrCreateSchema.string().setTitle('好友验证消息').setDescription(`设置后需要验证消息后才会自动同意好友`).setDefault('')
+    hello: BncrCreateSchema.string().setTitle('好友验证消息').setDescription(`设置后需要验证消息后才会自动同意好友`).setDefault(''),
+    autoReply: BncrCreateSchema.string().setTitle('通过好友后自动发送的消息').setDescription(`留空则不回复`).setDefault(''),
 });
 
 /* 配置管理器 */
@@ -33,8 +34,9 @@ module.exports = async () => {
     }
     if (!ConfigDB.userConfig.enable) return sysMethod.startOutLogs('未启用wechaty 退出.');
     const robotName = ConfigDB.userConfig.name || 'wechaty';
-    const accept = ConfigDB.userConfig.accept || true;
+    const accept = ConfigDB.userConfig.accept;
     const hello = ConfigDB.userConfig.hello || '';
+    const autoReply = ConfigDB.userConfig.autoReply || '';
     /** 定时器 */
     let timeoutID = setTimeout(() => {
         throw new Error('wechaty登录超时,放弃加载该适配器');
@@ -90,6 +92,7 @@ module.exports = async () => {
         console.log("wechaty：收到微信好友申请事件");
         if (friendship.type() === types.Friendship.Receive && (friendship.hello() === hello || hello == "") && accept) {
             await friendship.accept();
+            autoReply && await (friendship.contact()).say(autoReply);
         }
     });
 
@@ -99,7 +102,7 @@ module.exports = async () => {
             const contact = await bot.Contact.find({ name: "文件传输助手" });
             await contact.say("[爱心]")
         }
-        catch{}
+        catch { }
     });
 
     bot.on('message', async message => {
