@@ -3,8 +3,8 @@
  * @author 小寒寒
  * @name wechaty
  * @origin Bncr团队
- * @version 1.0.1
- * @description wx机器人适配器
+ * @version 1.0.2
+ * @description wx机器人内置适配器，微信需要实名
  * @adapter true
  * @public false
  * @disable false
@@ -48,7 +48,9 @@ module.exports = async () => {
     log.level('info')
     const { QRCodeTerminal } = require('wechaty-plugin-contrib');
     const { FileBox } = require('file-box')
-    const bot = WechatyBuilder.build({ name: robotName });
+    const bot = WechatyBuilder.build({
+        name: robotName
+    });
 
     // /* 注入发送消息方法 */
     wx.reply = async function (replyInfo, sendRes = '') {
@@ -88,12 +90,21 @@ module.exports = async () => {
         sysMethod.startOutLogs(`wechaty：${user} 登录成功`);
     });
 
+    bot.on('logout', (user) => {
+        sysMethod.startOutLogs(`wechaty：${user} 下线了`);
+    });
+
     bot.on('friendship', async friendship => {
         console.log("wechaty：收到微信好友申请事件");
-        if (friendship.type() === types.Friendship.Receive && (friendship.hello() === hello || hello == "") && accept) {
-            await friendship.accept();
-            autoReply && await (friendship.contact()).say(autoReply);
+        try {
+            if (friendship.type() === types.Friendship.Receive && (friendship.hello() === hello || hello == "") && accept) {
+                await friendship.accept();
+                const contact = friendship.contact();
+                await contact.sync();
+                autoReply && await contact.say(autoReply);
+            }
         }
+        catch (e) { }
     });
 
     // 心跳，防止掉线
@@ -102,10 +113,22 @@ module.exports = async () => {
             const contact = await bot.Contact.find({ name: "文件传输助手" });
             await contact.say("[爱心]")
         }
-        catch { }
+        catch (e) { }
     });
 
-    bot.on('message', async message => {
+    bot.on('error', async (error) => {
+        if (error.message.includes('Network error')) {
+            sysMethod.startOutLogs('wechaty：网络连接错误，尝试重启');
+            await bot.stop();
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+            await bot.start();
+        } else {
+            // Handle other types of errors as needed
+            console.error('wechaty：', error);
+        }
+    });
+
+    bot.on('message', message => {
         try {
             const contact = message.talker();
             if (contact.self()) return; // 屏蔽自己的消息
@@ -126,7 +149,7 @@ module.exports = async () => {
     });
 
     bot.use(QRCodeTerminal({ small: true }))
-    bot.start();
+    bot.start().catch(e => console.log(e));
 
     clearTimeout(timeoutID);
     return wx;
