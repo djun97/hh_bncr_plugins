@@ -20,15 +20,15 @@ const jsonSchema = BncrCreateSchema.object({
 	configs: BncrCreateSchema.array(BncrCreateSchema.object({
 		enable: BncrCreateSchema.boolean().setTitle('启用').setDescription('是否启用').setDefault(true),
 		listen: BncrCreateSchema.object({
-			id: BncrCreateSchema.string().setTitle('ID').setDescription(`监听的群号或个人id`).setDefault(""),
-			from: BncrCreateSchema.string().setTitle('类型').setDescription('群或个人2选1').setEnum(["userId", "groupId"]).setEnumNames(['个人', '群']).setDefault("groupId"),
-			type: BncrCreateSchema.string().setTitle('平台').setDescription(`填写适配器`).setDefault(''),
+			id: BncrCreateSchema.string().setTitle('ID').setDescription(`群号或个人id`).setDefault(""),
+			type: BncrCreateSchema.string().setTitle('类型').setDescription('群或个人2选1').setEnum(["userId", "groupId"]).setEnumNames(['个人', '群']).setDefault("groupId"),
+			from: BncrCreateSchema.string().setTitle('平台').setDescription(`填写适配器`).setDefault(''),
 		}).setTitle('监听来源').setDescription('配置监听来源').setDefault({}),
 		rule: BncrCreateSchema.array(BncrCreateSchema.string()).setTitle('触发关键词，填写“任意”则无视关键字').setDefault(['任意']),
 		toSender: BncrCreateSchema.array(BncrCreateSchema.object({
-			id: BncrCreateSchema.string().setTitle('ID').setDescription(`监听的群号或个人id`).setDefault(""),
-			from: BncrCreateSchema.string().setTitle('类型').setDescription('群或个人2选1').setEnum(["userId", "groupId"]).setEnumNames(['个人', '群']).setDefault("groupId"),
-			type: BncrCreateSchema.string().setTitle('平台').setDescription(`填写适配器`).setDefault(''),
+			id: BncrCreateSchema.string().setTitle('ID').setDescription(`群号或个人id`).setDefault(""),
+			type: BncrCreateSchema.string().setTitle('类型').setDescription('群或个人2选1').setEnum(["userId", "groupId"]).setEnumNames(['个人', '群']).setDefault("groupId"),
+			from: BncrCreateSchema.string().setTitle('平台').setDescription(`填写适配器`).setDefault(''),
 		})).setTitle('转发目的地').setDescription('转发到哪儿，支持多个').setDefault([]),
 		replace: BncrCreateSchema.array(BncrCreateSchema.object({
 			old: BncrCreateSchema.string().setTitle('旧消息').setDescription(`需要替换的旧消息`).setDefault(""),
@@ -48,13 +48,14 @@ module.exports = async s => {
 			return 'next';
 		}
 		const configs = ConfigDB.userConfig.configs.filter(o => o.enable) || [];
+
 		/* 异步处理 */
 		await new Promise(resolve => {
 			const msgInfo = s.msgInfo;
 			for (const config of configs) {
 				let msgStr = msgInfo.msg,
 					open = false;
-				if (msgInfo.from !== config.listen.from || +msgInfo[config.listen.type] !== config.listen.id) continue;
+				if (msgInfo.from !== config.listen.from || msgInfo[config.listen.type] !== config.listen.id) continue;
 				for (const rule of config.rule) {
 					if (msgInfo.msg.includes(rule) || rule == "任意") {
 						open = true;
