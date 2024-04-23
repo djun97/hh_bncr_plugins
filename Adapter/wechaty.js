@@ -3,7 +3,7 @@
  * @author 小寒寒
  * @name wechaty
  * @origin Bncr团队
- * @version 1.0.3
+ * @version 1.0.4
  * @description wx机器人内置适配器，微信需要实名
  * @adapter true
  * @public false
@@ -57,7 +57,7 @@ module.exports = async () => {
     /* 补全依赖 */
     await sysMethod.testModule(['wechaty', 'wechaty-plugin-contrib'], { install: true });
     const { WechatyBuilder, types, log } = require('wechaty');
-    log.level('info')
+    log.level('error')
     const { QRCodeTerminal } = require('wechaty-plugin-contrib');
     const { FileBox } = require('file-box')
     const bot = WechatyBuilder.build({
@@ -70,7 +70,12 @@ module.exports = async () => {
             const contact = await bot.Contact.find({ name: Buffer.from(replyInfo.userId, 'hex').toString('utf-8') });
             const room = replyInfo.groupId != "0" ? await bot.Room.find({ topic: Buffer.from(replyInfo.groupId, 'hex').toString('utf-8') }) : null;
             if (replyInfo.type === 'text') {
-                sendRes = room ? await room.say("\n" + replyInfo.msg, contact) : await contact.say(replyInfo.msg);
+                if (room) {
+                    sendRes = contact ? await room.say("\n" + replyInfo.msg, contact) : await room.say(replyInfo.msg)
+                }
+                else {
+                    sendRes = await contact.say(replyInfo.msg);
+                }
             }
             else if (['image', 'video'].includes(replyInfo.type)) {
                 const file = FileBox.fromUrl(replyInfo.path);
@@ -148,9 +153,6 @@ module.exports = async () => {
             await bot.stop();
             await new Promise((resolve) => setTimeout(resolve, 5000));
             await bot.start();
-        } else {
-            // Handle other types of errors as needed
-            console.error('wechaty：', error);
         }
     });
 
