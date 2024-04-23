@@ -25,7 +25,6 @@ const jsonSchema = BncrCreateSchema.object({
         autoReply: BncrCreateSchema.string().setTitle('通过好友后自动发送的消息').setDescription(`留空则不回复`).setDefault(''),
     }).setTitle('好友相关').setDefault({}),
     room: BncrCreateSchema.object({
-        joinEnable: BncrCreateSchema.boolean().setTitle('自动同意进群').setDescription(`邀请机器人进群时，自动同意进群`).setDefault(false),
         joinList: BncrCreateSchema.string().setTitle('进群监控').setDescription(`当有人进群后触发消息监控的群，多个用,隔开`).setDefault(""),
         joinTips: BncrCreateSchema.string().setTitle('进群提示').setDescription(`当有人进群后触发消息`).setDefault("欢迎加入大家庭~")
     }).setTitle('群聊相关').setDefault({})
@@ -47,7 +46,6 @@ module.exports = async () => {
     const hello = ConfigDB.userConfig.friend.hello || '';
     const autoReply = ConfigDB.userConfig.friend.autoReply || '';
 
-    const joinEnable = ConfigDB.userConfig.room.joinEnable;
     const joinList = ConfigDB.userConfig.room.joinList?.split(",") || [];
     const joinTips = ConfigDB.userConfig.room.joinTips || '欢迎加入大家庭~';
 
@@ -113,7 +111,6 @@ module.exports = async () => {
     // 邀请进群
     bot.on("room-invite", async (roomInvitation) => {
         log.warn(`wechaty：收到邀请机器人进群事件`);
-        joinEnable && await roomInvitation.accept();
     })
 
     bot.on("room-topic", async (room, newTopic, oldTopic, changer) => {
