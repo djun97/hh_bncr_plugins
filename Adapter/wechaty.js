@@ -3,7 +3,7 @@
  * @author 小寒寒
  * @name wechaty
  * @origin Bncr团队
- * @version 1.0.4
+ * @version 1.0.5
  * @description wx机器人内置适配器，微信需要实名
  * @adapter true
  * @public false
@@ -80,7 +80,7 @@ module.exports = async () => {
             else if (['image', 'video'].includes(replyInfo.type)) {
                 const file = FileBox.fromUrl(replyInfo.path);
                 file['_name'] += replyInfo.type == 'image' ? '.png' : '.mp4';
-                sendRes = await contact.say(file);
+                sendRes = room ? await room.say(file) : await contact.say(file);
             }
             return sendRes ? sendRes.id : '0';
         } catch (e) {
