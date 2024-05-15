@@ -1,15 +1,21 @@
 /**
  * @name SpyHandleMsg
- * @version v2.0.0
- * @author Aming
- * @origin 红灯区
+ * @version v2.0.1
+ * @author 小寒寒
+ * @team 红灯区
  * @create_at 2033-10-27 11:12:09
- * @description 当触发的消息中没有 export线报时,触发的消息会经过此模块解析
+ * @description 基于红灯区修改，适配可视化和V1、V2分享解析，当触发的消息中没有 export线报时,触发的消息会经过此模块解析
  * @module true
  * @public false
+ * @authentication true
+ * @classification ["模块"]
  */
 
 const jsonSchema = BncrCreateSchema.object({
+    jCommand: BncrCreateSchema.object({
+        host: BncrCreateSchema.string().setTitle('反代').setDescription(`填写兔子的反代`).setDefault(""),
+        token: BncrCreateSchema.string().setTitle('token').setDescription(`填写兔子的token`).setDefault("")
+    }).setTitle('口令配置').setDescription(`用于解析口令，目前仅支持rabbit`).setDefault({}),
     list: BncrCreateSchema.array(BncrCreateSchema.object({
         keyword: BncrCreateSchema.string().setTitle('keyword').setDescription(`填写正则表达式，开头结尾无需“/”`).setDefault(""),
         name: BncrCreateSchema.string().setTitle('name').setDescription(`任务名称`).setDefault(""),
@@ -31,12 +37,12 @@ const jsonSchema = BncrCreateSchema.object({
 
 const ConfigDB = new BncrPluginConfig(jsonSchema);
 
-const Doraemon_tool = require('../../Doraemon/mod/Doraemon_tool');
 const wx100shareParse = require('../../hh_bncr_plugins/mod/wx100shareParse');
+const request = require('util').promisify(require('request'));
 
 module.exports = async msg => {
 
-    await ConfigDB.get();
+    // await ConfigDB.get();
     if (!Object.keys(ConfigDB.userConfig).length) {
         console.log('请先发送"修改无界配置",或者前往前端web"插件配置"来完成插件首次配置');
         return '';
@@ -84,15 +90,25 @@ module.exports = async msg => {
  *
  */
 function ListS() {
-    return ConfigDB.userConfig.list.filter(o => o.enable);
+    return ConfigDB.userConfig.list?.filter(o => o.enable) || [];
 }
 
 /* 口令解析接口 */
 async function jCommand(code) {
     try {
+        const option = {
+            method: 'POST',
+            url: `${ConfigDB.userConfig.jCommand.host || ''}/api/command`,
+            headers: {},
+            formData: {
+                'code': decodeURIComponent(code),
+                'token': ConfigDB.userConfig.jCommand.token || ''
+            },
+            json: true
+        }
         return (
-            await Doraemon_tool.commandParse(code)
-        )?.jumpUrl;
+            await request(option)
+        ).body?.data?.jumpUrl;
     } catch (e) {
         console.log('jCommand ' + e);
         return void 0;
