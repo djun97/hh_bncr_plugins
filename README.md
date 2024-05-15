@@ -1,5 +1,5 @@
 # hh_bncr_plugins
-自行研究，无教程无帮助，不定时更新~
+无限期停更，无界3.0即将发布
 # 友情链接（排名不分先后）
 - 无界官网
   https://anmours.github.io/Bncr
