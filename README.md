@@ -1,5 +1,7 @@
 # hh_bncr_plugins
-无限期停更，无界3.0即将发布
+github无限期停更，无界3.0已发布
+订阅链接
+`bncrsub://3BPeb/Ff4FlBAx372D99jdVghsmvkSgLBq9KU/hngTdwC2GEcEwqYWSWDYKb6RfikHZG1cRp8/VvIGJ786YOuBlGXSIKXzAA1klCLP7Pc80=`
 # 友情链接（排名不分先后）
 - 无界官网
   https://anmours.github.io/Bncr
