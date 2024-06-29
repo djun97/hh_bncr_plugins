@@ -2,6 +2,7 @@
 github无限期停更，无界3.0已发布
 # 订阅链接
 **为了无界更好的发展，所有插件均已删除超授限制，所有用户可订阅**
+**一般情况不会解答任何问题，有bug可以反馈，随缘修复、随缘更新**
 `bncrsub://3BPeb/Ff4FlBAx372D99jdVghsmvkSgLBq9KU/hngTdwC2GEcEwqYWSWDYKb6RfikHZG1cRp8/VvIGJ786YOuBlGXSIKXzAA1klCLP7Pc80=`
 # 友情链接（排名不分先后）
 - 无界官网
